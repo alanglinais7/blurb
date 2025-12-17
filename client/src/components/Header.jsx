@@ -28,7 +28,7 @@ export default function Header() {
   return (
     <header className="header">
       <div className="logo">
-        <h1>blurb</h1>
+        <h1>blurble</h1>
       </div>
 
       <nav className="nav">
