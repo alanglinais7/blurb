@@ -76,7 +76,6 @@ export default function Leaderboard() {
               <th>#</th>
               <th>name</th>
               <th>wpm</th>
-              <th>acc</th>
             </tr>
           </thead>
           <tbody>
@@ -85,7 +84,6 @@ export default function Leaderboard() {
                 <td className="rank">{index + 1}</td>
                 <td className="username">{entry.username}</td>
                 <td className="wpm">{Math.round(entry.wpm)}</td>
-                <td className="accuracy">{Math.round(entry.accuracy)}%</td>
               </tr>
             ))}
           </tbody>
