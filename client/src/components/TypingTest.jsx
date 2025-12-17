@@ -113,22 +113,40 @@ export default function TypingTest({ onScoreSubmit }) {
   const renderQuote = () => {
     if (!quote) return null;
 
-    return quote.text.split('').map((char, index) => {
-      let className = '';
+    // Split into words (keeping spaces as separate elements)
+    const words = quote.text.split(/(\s+)/);
+    let charIndex = 0;
 
-      if (index < input.length) {
-        className = input[index] === char ? 'correct' : 'incorrect';
-      } else if (index === input.length) {
-        className = 'cursor';
+    return words.map((word, wordIndex) => {
+      const chars = word.split('').map((char, i) => {
+        const currentIndex = charIndex + i;
+        let className = '';
+
+        if (currentIndex < input.length) {
+          className = input[currentIndex] === char ? 'correct' : 'incorrect';
+        } else if (currentIndex === input.length) {
+          className = 'cursor';
+        }
+
+        return (
+          <span key={currentIndex} className={className}>
+            {char}
+          </span>
+        );
+      });
+
+      charIndex += word.length;
+
+      // Wrap non-space words in a span with nowrap to keep them together
+      if (word.trim()) {
+        return (
+          <span key={wordIndex} style={{ whiteSpace: 'nowrap' }}>
+            {chars}
+          </span>
+        );
       }
-
-      const displayChar = char === ' ' ? '\u00A0' : char;
-
-      return (
-        <span key={index} className={className}>
-          {displayChar}
-        </span>
-      );
+      // Return spaces as-is (allows line breaks)
+      return chars;
     });
   };
 
