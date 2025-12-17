@@ -8,6 +8,7 @@
     { "source": "/api/auth/login", "destination": "/api/auth/login" },
     { "source": "/api/auth/me", "destination": "/api/auth/me" },
     { "source": "/api/quotes/random", "destination": "/api/quotes/random" },
+    { "source": "/api/quotes/daily", "destination": "/api/quotes/daily" },
     { "source": "/api/scores", "destination": "/api/scores/index" },
     { "source": "/api/scores/leaderboard", "destination": "/api/scores/leaderboard" },
     { "source": "/api/scores/my-scores", "destination": "/api/scores/my-scores" },

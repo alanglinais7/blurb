@@ -46,6 +46,7 @@ export const auth = {
 // Quotes API
 export const quotes = {
   getRandom: () => fetchAPI('/quotes/random'),
+  getDaily: () => fetchAPI('/quotes/daily'),
 };
 
 // Scores API

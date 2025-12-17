@@ -9,16 +9,18 @@ export default function TypingTest({ onScoreSubmit }) {
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [gameState, setGameState] = useState('waiting');
+  const [mode, setMode] = useState('daily'); // 'daily' or 'practice'
   const inputRef = useRef(null);
 
-  const [error, setError] = useState(null);
-
-  const fetchQuote = useCallback(async () => {
+  const fetchQuote = useCallback(async (quoteMode) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await quotes.getRandom();
+      const data = quoteMode === 'daily'
+        ? await quotes.getDaily()
+        : await quotes.getRandom();
       setQuote(data);
       setInput('');
       setStartTime(null);
@@ -33,14 +35,19 @@ export default function TypingTest({ onScoreSubmit }) {
   }, []);
 
   useEffect(() => {
-    fetchQuote();
-  }, [fetchQuote]);
+    fetchQuote(mode);
+  }, [mode]);
 
   useEffect(() => {
     if (gameState === 'waiting' && inputRef.current) {
       inputRef.current.focus();
     }
   }, [gameState, quote]);
+
+  const handleModeChange = (newMode) => {
+    setMode(newMode);
+    fetchQuote(newMode);
+  };
 
   const handleInputChange = async (e) => {
     const value = e.target.value;
@@ -62,7 +69,8 @@ export default function TypingTest({ onScoreSubmit }) {
       const wpm = Math.round(wordCount / timeInMinutes);
       const accuracy = 100;
 
-      if (user) {
+      // Only submit score if logged in AND in daily mode
+      if (user && mode === 'daily') {
         try {
           await scores.submit(wpm, accuracy, quote.id);
           if (onScoreSubmit) onScoreSubmit();
@@ -138,13 +146,28 @@ export default function TypingTest({ onScoreSubmit }) {
     return (
       <div className="typing-test">
         <p className="error">{error}</p>
-        <button className="btn-primary" onClick={fetchQuote}>retry</button>
+        <button className="btn-primary" onClick={() => fetchQuote(mode)}>retry</button>
       </div>
     );
   }
 
   return (
     <div className="typing-test">
+      <div className="mode-toggle">
+        <button
+          className={mode === 'daily' ? 'active' : ''}
+          onClick={() => handleModeChange('daily')}
+        >
+          daily
+        </button>
+        <button
+          className={mode === 'practice' ? 'active' : ''}
+          onClick={() => handleModeChange('practice')}
+        >
+          practice
+        </button>
+      </div>
+
       {gameState === 'finished' ? (
         <div className="results">
           <h2>done</h2>
@@ -158,11 +181,14 @@ export default function TypingTest({ onScoreSubmit }) {
               <span className="label">time</span>
             </div>
           </div>
-          {!user && (
+          {mode === 'daily' && !user && (
             <p className="login-prompt">login to save your score</p>
           )}
-          <button className="btn-primary" onClick={fetchQuote}>
-            again
+          {mode === 'practice' && (
+            <p className="login-prompt">practice mode - score not recorded</p>
+          )}
+          <button className="btn-primary" onClick={() => fetchQuote(mode)}>
+            {mode === 'daily' ? 'again' : 'next'}
           </button>
         </div>
       ) : (
