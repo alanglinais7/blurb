@@ -1,6 +1,9 @@
 import pg from 'pg';
 
-const { Pool, nativeBinding } = pg;
+// Required for Supabase SSL certificates
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+const { Pool } = pg;
 
 let pool;
 
@@ -12,12 +15,14 @@ function getPool() {
       process.env.POSTGRES_URL_NON_POOLING;
 
     if (!connectionString) {
-      throw new Error('No database connection string found. Available env vars: ' +
-        Object.keys(process.env).filter(k => k.includes('POSTGRES') || k.includes('DATABASE')).join(', '));
+      throw new Error('No database connection string found');
     }
 
     pool = new Pool({
-      connectionString
+      connectionString,
+      ssl: {
+        rejectUnauthorized: false
+      }
     });
   }
   return pool;
