@@ -62,6 +62,8 @@ export const scores = {
   getMyScores: () => fetchAPI('/scores/my-scores'),
 
   getMyStats: () => fetchAPI('/scores/my-stats'),
+
+  getHistory: () => fetchAPI('/scores/history'),
 };
 
 export default { auth, quotes, scores };

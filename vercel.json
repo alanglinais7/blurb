@@ -13,6 +13,7 @@
     { "source": "/api/scores/leaderboard", "destination": "/api/scores/leaderboard" },
     { "source": "/api/scores/my-scores", "destination": "/api/scores/my-scores" },
     { "source": "/api/scores/my-stats", "destination": "/api/scores/my-stats" },
+    { "source": "/api/scores/history", "destination": "/api/scores/history" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

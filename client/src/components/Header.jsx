@@ -3,16 +3,19 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import Login from './Login';
 import Register from './Register';
+import Profile from './Profile';
 
 export default function Header() {
   const { user, logout } = useAuth();
   const { theme, toggle } = useTheme();
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   const closeModals = () => {
     setShowLogin(false);
     setShowRegister(false);
+    setShowProfile(false);
   };
 
   const switchToRegister = () => {
@@ -38,7 +41,9 @@ export default function Header() {
 
         {user ? (
           <div className="user-info">
-            <span className="username">{user.username}</span>
+            <button className="username-btn" onClick={() => setShowProfile(true)}>
+              {user.username}
+            </button>
             <button className="btn-secondary" onClick={logout}>
               logout
             </button>
@@ -60,6 +65,9 @@ export default function Header() {
       )}
       {showRegister && (
         <Register onClose={closeModals} switchToLogin={switchToLogin} />
+      )}
+      {showProfile && (
+        <Profile onClose={closeModals} />
       )}
     </header>
   );
