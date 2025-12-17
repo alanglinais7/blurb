@@ -42,13 +42,11 @@ export default async function handler(req, res) {
     const result = await query(`
       SELECT
         u.username,
-        MAX(s.wpm) as wpm,
-        s.accuracy,
-        s.played_at
+        MAX(s.wpm) as wpm
       FROM scores s
       JOIN users u ON s.user_id = u.id
       WHERE s.played_at >= $1 AND s.played_at <= $2
-      GROUP BY u.username, s.accuracy, s.played_at
+      GROUP BY u.username
       ORDER BY wpm DESC
       LIMIT 10
     `, [start, end]);
