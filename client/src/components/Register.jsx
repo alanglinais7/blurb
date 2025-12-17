@@ -14,7 +14,7 @@ export default function Register({ onClose, switchToLogin }) {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('passwords do not match');
       return;
     }
 
@@ -34,11 +34,11 @@ export default function Register({ onClose, switchToLogin }) {
     <div className="auth-modal">
       <div className="auth-content">
         <button className="close-btn" onClick={onClose}>&times;</button>
-        <h2>Register</h2>
+        <h2>register</h2>
         <form onSubmit={handleSubmit}>
           {error && <div className="error">{error}</div>}
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">username</label>
             <input
               type="text"
               id="username"
@@ -51,7 +51,7 @@ export default function Register({ onClose, switchToLogin }) {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">password</label>
             <input
               type="password"
               id="password"
@@ -62,7 +62,7 @@ export default function Register({ onClose, switchToLogin }) {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+            <label htmlFor="confirmPassword">confirm password</label>
             <input
               type="password"
               id="confirmPassword"
@@ -72,12 +72,12 @@ export default function Register({ onClose, switchToLogin }) {
             />
           </div>
           <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? 'Creating account...' : 'Register'}
+            {loading ? 'loading...' : 'register'}
           </button>
         </form>
         <p className="auth-switch">
-          Already have an account?{' '}
-          <button type="button" onClick={switchToLogin}>Login</button>
+          have an account?{' '}
+          <button type="button" onClick={switchToLogin}>login</button>
         </p>
       </div>
     </div>

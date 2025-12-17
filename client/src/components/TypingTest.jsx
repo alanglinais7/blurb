@@ -9,7 +9,7 @@ export default function TypingTest({ onScoreSubmit }) {
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [gameState, setGameState] = useState('waiting'); // waiting, playing, finished
+  const [gameState, setGameState] = useState('waiting');
   const inputRef = useRef(null);
 
   const fetchQuote = useCallback(async () => {
@@ -41,7 +41,6 @@ export default function TypingTest({ onScoreSubmit }) {
   const handleInputChange = async (e) => {
     const value = e.target.value;
 
-    // Start timer on first keystroke
     if (!startTime && value.length > 0) {
       setStartTime(Date.now());
       setGameState('playing');
@@ -49,23 +48,16 @@ export default function TypingTest({ onScoreSubmit }) {
 
     setInput(value);
 
-    // Check if finished
     if (value === quote.text) {
       const end = Date.now();
       setEndTime(end);
       setGameState('finished');
 
-      // Calculate results
       const timeInMinutes = (end - startTime) / 60000;
-      const wordCount = quote.text.length / 5; // Standard: 5 chars = 1 word
+      const wordCount = quote.text.length / 5;
       const wpm = Math.round(wordCount / timeInMinutes);
-
-      // Calculate accuracy (characters typed correctly vs total keystrokes)
-      // For simplicity, if they finished correctly, accuracy is 100%
-      // In a more complex version, we'd track all keystrokes
       const accuracy = 100;
 
-      // Submit score if logged in
       if (user) {
         try {
           await scores.submit(wpm, accuracy, quote.id);
@@ -84,7 +76,6 @@ export default function TypingTest({ onScoreSubmit }) {
     const wordCount = input.length / 5;
     const wpm = timeInMinutes > 0 ? Math.round(wordCount / timeInMinutes) : 0;
 
-    // Calculate accuracy based on current input vs quote
     let correctChars = 0;
     for (let i = 0; i < input.length; i++) {
       if (input[i] === quote.text[i]) {
@@ -104,7 +95,7 @@ export default function TypingTest({ onScoreSubmit }) {
     const wordCount = quote.text.length / 5;
     const wpm = Math.round(wordCount / timeInMinutes);
 
-    return { wpm, time: timeInSeconds.toFixed(2) };
+    return { wpm, time: timeInSeconds.toFixed(1) };
   };
 
   const renderQuote = () => {
@@ -119,7 +110,6 @@ export default function TypingTest({ onScoreSubmit }) {
         className = 'cursor';
       }
 
-      // Handle space visibility
       const displayChar = char === ' ' ? '\u00A0' : char;
 
       return (
@@ -135,7 +125,7 @@ export default function TypingTest({ onScoreSubmit }) {
   if (loading) {
     return (
       <div className="typing-test">
-        <p className="loading">Loading quote...</p>
+        <p className="loading">loading...</p>
       </div>
     );
   }
@@ -144,29 +134,29 @@ export default function TypingTest({ onScoreSubmit }) {
     <div className="typing-test">
       {gameState === 'finished' ? (
         <div className="results">
-          <h2>Complete!</h2>
+          <h2>done</h2>
           <div className="stats-final">
             <div className="stat">
               <span className="value">{getFinalStats().wpm}</span>
-              <span className="label">WPM</span>
+              <span className="label">wpm</span>
             </div>
             <div className="stat">
               <span className="value">{getFinalStats().time}s</span>
-              <span className="label">Time</span>
+              <span className="label">time</span>
             </div>
           </div>
           {!user && (
-            <p className="login-prompt">Login to save your score to the leaderboard!</p>
+            <p className="login-prompt">login to save your score</p>
           )}
           <button className="btn-primary" onClick={fetchQuote}>
-            Try Again
+            again
           </button>
         </div>
       ) : (
         <>
           <div className="quote-display">
             <p className="quote-text">{renderQuote()}</p>
-            {quote.source && <p className="quote-source">— {quote.source}</p>}
+            {quote.source && <p className="quote-source">{quote.source}</p>}
           </div>
 
           <div className="input-area">
@@ -174,7 +164,7 @@ export default function TypingTest({ onScoreSubmit }) {
               ref={inputRef}
               value={input}
               onChange={handleInputChange}
-              placeholder={gameState === 'waiting' ? 'Start typing...' : ''}
+              placeholder={gameState === 'waiting' ? 'start typing...' : ''}
               spellCheck={false}
               autoComplete="off"
               autoCorrect="off"
@@ -184,16 +174,14 @@ export default function TypingTest({ onScoreSubmit }) {
 
           {gameState === 'playing' && (
             <div className="stats-live">
-              <span className="wpm">{currentStats.wpm} WPM</span>
-              <span className="accuracy">{currentStats.accuracy}% accuracy</span>
-              <span className="progress">
-                {input.length} / {quote.text.length}
-              </span>
+              <span>{currentStats.wpm} wpm</span>
+              <span>{currentStats.accuracy}%</span>
+              <span>{input.length}/{quote.text.length}</span>
             </div>
           )}
 
           {gameState === 'waiting' && (
-            <p className="hint">Start typing to begin the test</p>
+            <p className="hint">start typing to begin</p>
           )}
         </>
       )}

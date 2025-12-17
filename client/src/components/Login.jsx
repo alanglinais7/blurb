@@ -27,11 +27,11 @@ export default function Login({ onClose, switchToRegister }) {
     <div className="auth-modal">
       <div className="auth-content">
         <button className="close-btn" onClick={onClose}>&times;</button>
-        <h2>Login</h2>
+        <h2>login</h2>
         <form onSubmit={handleSubmit}>
           {error && <div className="error">{error}</div>}
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">username</label>
             <input
               type="text"
               id="username"
@@ -42,7 +42,7 @@ export default function Login({ onClose, switchToRegister }) {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">password</label>
             <input
               type="password"
               id="password"
@@ -52,12 +52,12 @@ export default function Login({ onClose, switchToRegister }) {
             />
           </div>
           <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'loading...' : 'login'}
           </button>
         </form>
         <p className="auth-switch">
-          Don't have an account?{' '}
-          <button type="button" onClick={switchToRegister}>Register</button>
+          no account?{' '}
+          <button type="button" onClick={switchToRegister}>register</button>
         </p>
       </div>
     </div>

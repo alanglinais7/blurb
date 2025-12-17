@@ -12,7 +12,7 @@ export default function Leaderboard() {
       setLeaderboard(data);
       setError('');
     } catch (err) {
-      setError('Failed to load leaderboard');
+      setError('failed to load');
     } finally {
       setLoading(false);
     }
@@ -20,15 +20,13 @@ export default function Leaderboard() {
 
   useEffect(() => {
     fetchLeaderboard();
-    // Refresh every 30 seconds
     const interval = setInterval(fetchLeaderboard, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  // Calculate time until midnight EST
   const getTimeUntilReset = () => {
     const now = new Date();
-    const estOffset = -5 * 60; // EST offset in minutes
+    const estOffset = -5 * 60;
     const utcNow = now.getTime() + now.getTimezoneOffset() * 60000;
     const estNow = new Date(utcNow + estOffset * 60000);
 
@@ -54,8 +52,8 @@ export default function Leaderboard() {
   if (loading) {
     return (
       <div className="leaderboard">
-        <h2>Today's Leaderboard</h2>
-        <p className="loading">Loading...</p>
+        <h2>today</h2>
+        <p className="loading">loading...</p>
       </div>
     );
   }
@@ -63,27 +61,27 @@ export default function Leaderboard() {
   return (
     <div className="leaderboard">
       <div className="leaderboard-header">
-        <h2>Today's Leaderboard</h2>
-        <span className="reset-timer">Resets in {timeUntilReset}</span>
+        <h2>today</h2>
+        <span className="reset-timer">resets {timeUntilReset}</span>
       </div>
 
       {error && <p className="error">{error}</p>}
 
       {leaderboard.length === 0 ? (
-        <p className="empty">No scores yet today. Be the first!</p>
+        <p className="empty">no scores yet</p>
       ) : (
         <table>
           <thead>
             <tr>
               <th>#</th>
-              <th>Player</th>
-              <th>WPM</th>
-              <th>Accuracy</th>
+              <th>name</th>
+              <th>wpm</th>
+              <th>acc</th>
             </tr>
           </thead>
           <tbody>
             {leaderboard.map((entry, index) => (
-              <tr key={index} className={index < 3 ? `rank-${index + 1}` : ''}>
+              <tr key={index}>
                 <td className="rank">{index + 1}</td>
                 <td className="username">{entry.username}</td>
                 <td className="wpm">{Math.round(entry.wpm)}</td>
