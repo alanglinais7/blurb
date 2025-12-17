@@ -191,11 +191,9 @@ button {
   font-size: 1.125rem;
   line-height: 2;
   color: var(--text-muted);
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: pre-wrap;
-  display: block;
-  width: 100%;
+  word-break: normal;
+  overflow-wrap: normal;
+  white-space: normal;
 }
 
 .quote-text .correct {
