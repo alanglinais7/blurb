@@ -1,14 +1,23 @@
 import pg from 'pg';
 
-const { Pool } = pg;
+const { Pool, nativeBinding } = pg;
 
 let pool;
 
 function getPool() {
   if (!pool) {
+    const connectionString =
+      process.env.POSTGRES_URL ||
+      process.env.DATABASE_URL ||
+      process.env.POSTGRES_URL_NON_POOLING;
+
+    if (!connectionString) {
+      throw new Error('No database connection string found. Available env vars: ' +
+        Object.keys(process.env).filter(k => k.includes('POSTGRES') || k.includes('DATABASE')).join(', '));
+    }
+
     pool = new Pool({
-      connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
-      ssl: { rejectUnauthorized: false }
+      connectionString
     });
   }
   return pool;

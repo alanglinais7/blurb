@@ -12,8 +12,11 @@ export default function TypingTest({ onScoreSubmit }) {
   const [gameState, setGameState] = useState('waiting');
   const inputRef = useRef(null);
 
+  const [error, setError] = useState(null);
+
   const fetchQuote = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await quotes.getRandom();
       setQuote(data);
@@ -23,6 +26,7 @@ export default function TypingTest({ onScoreSubmit }) {
       setGameState('waiting');
     } catch (err) {
       console.error('Failed to fetch quote:', err);
+      setError('failed to load quote');
     } finally {
       setLoading(false);
     }
@@ -126,6 +130,15 @@ export default function TypingTest({ onScoreSubmit }) {
     return (
       <div className="typing-test">
         <p className="loading">loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="typing-test">
+        <p className="error">{error}</p>
+        <button className="btn-primary" onClick={fetchQuote}>retry</button>
       </div>
     );
   }
