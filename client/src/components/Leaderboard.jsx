@@ -76,6 +76,7 @@ export default function Leaderboard() {
               <th>#</th>
               <th>name</th>
               <th>wpm</th>
+              <th>time</th>
             </tr>
           </thead>
           <tbody>
@@ -84,6 +85,7 @@ export default function Leaderboard() {
                 <td className="rank">{index + 1}</td>
                 <td className="username">{entry.username}</td>
                 <td className="wpm">{Math.round(entry.wpm)}</td>
+                <td className="time">{entry.time}s</td>
               </tr>
             ))}
           </tbody>

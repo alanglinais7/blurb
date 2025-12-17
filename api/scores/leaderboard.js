@@ -39,19 +39,32 @@ export default async function handler(req, res) {
 
     const { start, end } = getTodayBoundsEST();
 
+    // Get each user's best score with the quote length to calculate time
     const result = await query(`
-      SELECT
+      SELECT DISTINCT ON (u.username)
         u.username,
-        MAX(s.wpm) as wpm
+        s.wpm,
+        LENGTH(q.text) as quote_length
       FROM scores s
       JOIN users u ON s.user_id = u.id
+      JOIN quotes q ON s.quote_id = q.id
       WHERE s.played_at >= $1 AND s.played_at <= $2
-      GROUP BY u.username
-      ORDER BY wpm DESC
-      LIMIT 10
+      ORDER BY u.username, s.wpm DESC
     `, [start, end]);
 
-    res.json(result.rows);
+    // Calculate time and sort by WPM
+    const withTime = result.rows.map(row => {
+      // WPM = (chars / 5) / minutes, so minutes = (chars / 5) / WPM
+      const words = row.quote_length / 5;
+      const minutes = words / row.wpm;
+      const seconds = minutes * 60;
+      return {
+        ...row,
+        time: seconds.toFixed(1)
+      };
+    }).sort((a, b) => b.wpm - a.wpm).slice(0, 10);
+
+    res.json(withTime);
   } catch (err) {
     console.error('Leaderboard fetch error:', err);
     res.status(500).json({ error: 'Server error' });
