@@ -145,7 +145,6 @@ button {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  overflow: hidden;
 }
 
 /* Mode toggle */
@@ -185,7 +184,6 @@ button {
 .quote-display {
   margin-bottom: 2rem;
   max-width: 100%;
-  overflow: hidden;
 }
 
 .quote-text {
