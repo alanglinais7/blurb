@@ -221,6 +221,7 @@ export default function TypingTest({ onScoreSubmit }) {
               ref={inputRef}
               value={input}
               onChange={handleInputChange}
+              onPaste={(e) => e.preventDefault()}
               placeholder={gameState === 'waiting' ? 'start typing...' : ''}
               spellCheck={false}
               autoComplete="off"
