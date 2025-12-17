@@ -1,9 +1,8 @@
 import bcrypt from 'bcryptjs';
-import { sql, initDb } from '../db.js';
+import { query, initDb } from '../db.js';
 import { generateToken } from '../auth.js';
 
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -25,8 +24,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Username and password required' });
     }
 
-    const { rows } = await sql`SELECT * FROM users WHERE username = ${username}`;
-    const user = rows[0];
+    const result = await query('SELECT * FROM users WHERE username = $1', [username]);
+    const user = result.rows[0];
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });

@@ -1,7 +1,6 @@
-import { sql, initDb, seedQuotes } from '../db.js';
+import { query, initDb, seedQuotes } from '../db.js';
 
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -18,8 +17,8 @@ export default async function handler(req, res) {
     await initDb();
     await seedQuotes();
 
-    const { rows } = await sql`SELECT * FROM quotes ORDER BY RANDOM() LIMIT 1`;
-    const quote = rows[0];
+    const result = await query('SELECT * FROM quotes ORDER BY RANDOM() LIMIT 1');
+    const quote = result.rows[0];
 
     if (!quote) {
       return res.status(404).json({ error: 'No quotes available' });

@@ -1,9 +1,8 @@
 import bcrypt from 'bcryptjs';
-import { sql, initDb, seedQuotes } from '../db.js';
+import { query, initDb, seedQuotes } from '../db.js';
 import { generateToken } from '../auth.js';
 
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -17,7 +16,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Initialize DB on first request
     await initDb();
     await seedQuotes();
 
@@ -35,21 +33,18 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Password must be at least 6 characters' });
     }
 
-    // Check if username exists
-    const { rows: existing } = await sql`SELECT id FROM users WHERE username = ${username}`;
-    if (existing.length > 0) {
+    const existing = await query('SELECT id FROM users WHERE username = $1', [username]);
+    if (existing.rows.length > 0) {
       return res.status(400).json({ error: 'Username already taken' });
     }
 
-    // Hash password and create user
     const passwordHash = await bcrypt.hash(password, 10);
-    const { rows } = await sql`
-      INSERT INTO users (username, password_hash)
-      VALUES (${username}, ${passwordHash})
-      RETURNING id, username
-    `;
+    const result = await query(
+      'INSERT INTO users (username, password_hash) VALUES ($1, $2) RETURNING id, username',
+      [username, passwordHash]
+    );
 
-    const user = rows[0];
+    const user = result.rows[0];
     const token = generateToken(user);
 
     res.json({ user, token });

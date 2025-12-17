@@ -1,8 +1,7 @@
-import { sql, initDb } from '../db.js';
+import { query, initDb } from '../db.js';
 import { requireAuth } from '../auth.js';
 
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -29,14 +28,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Score values out of range' });
     }
 
-    const { rows } = await sql`
-      INSERT INTO scores (user_id, wpm, accuracy, quote_id)
-      VALUES (${user.id}, ${wpm}, ${accuracy}, ${quoteId || null})
-      RETURNING id
-    `;
+    const result = await query(
+      'INSERT INTO scores (user_id, wpm, accuracy, quote_id) VALUES ($1, $2, $3, $4) RETURNING id',
+      [user.id, wpm, accuracy, quoteId || null]
+    );
 
     res.json({
-      id: rows[0].id,
+      id: result.rows[0].id,
       wpm,
       accuracy,
       message: 'Score submitted successfully'

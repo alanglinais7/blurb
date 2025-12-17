@@ -1,7 +1,6 @@
-import { sql, initDb } from '../db.js';
+import { query, initDb } from '../db.js';
 import { requireAuth } from '../auth.js';
 
-// Helper to get today's date boundaries in EST
 function getTodayBoundsEST() {
   const now = new Date();
   const estOffset = -5;
@@ -24,7 +23,6 @@ function getTodayBoundsEST() {
 }
 
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -43,24 +41,20 @@ export default async function handler(req, res) {
     const user = requireAuth(req);
     const { start, end } = getTodayBoundsEST();
 
-    const { rows: scores } = await sql`
+    const scoresResult = await query(`
       SELECT wpm, accuracy, played_at
       FROM scores
-      WHERE user_id = ${user.id}
-        AND played_at >= ${start}::timestamp
-        AND played_at <= ${end}::timestamp
+      WHERE user_id = $1 AND played_at >= $2 AND played_at <= $3
       ORDER BY played_at DESC
-    `;
+    `, [user.id, start, end]);
 
-    const { rows: bestRows } = await sql`
+    const bestResult = await query(`
       SELECT MAX(wpm) as bestwpm, MAX(accuracy) as bestaccuracy
       FROM scores
-      WHERE user_id = ${user.id}
-        AND played_at >= ${start}::timestamp
-        AND played_at <= ${end}::timestamp
-    `;
+      WHERE user_id = $1 AND played_at >= $2 AND played_at <= $3
+    `, [user.id, start, end]);
 
-    res.json({ scores, best: bestRows[0] });
+    res.json({ scores: scoresResult.rows, best: bestResult.rows[0] });
   } catch (err) {
     if (err.message === 'Unauthorized') {
       return res.status(401).json({ error: 'Unauthorized' });

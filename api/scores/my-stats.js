@@ -1,8 +1,7 @@
-import { sql, initDb } from '../db.js';
+import { query, initDb } from '../db.js';
 import { requireAuth } from '../auth.js';
 
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -20,17 +19,17 @@ export default async function handler(req, res) {
 
     const user = requireAuth(req);
 
-    const { rows } = await sql`
+    const result = await query(`
       SELECT
         COUNT(*) as totalgames,
         AVG(wpm) as avgwpm,
         MAX(wpm) as bestwpm,
         AVG(accuracy) as avgaccuracy
       FROM scores
-      WHERE user_id = ${user.id}
-    `;
+      WHERE user_id = $1
+    `, [user.id]);
 
-    res.json(rows[0]);
+    res.json(result.rows[0]);
   } catch (err) {
     if (err.message === 'Unauthorized') {
       return res.status(401).json({ error: 'Unauthorized' });

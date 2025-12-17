@@ -1,17 +1,37 @@
-import { sql } from '@vercel/postgres';
+import pg from 'pg';
+
+const { Pool } = pg;
+
+let pool;
+
+function getPool() {
+  if (!pool) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL || process.env.POSTGRES_URL,
+      ssl: { rejectUnauthorized: false }
+    });
+  }
+  return pool;
+}
+
+export async function query(text, params) {
+  const pool = getPool();
+  const result = await pool.query(text, params);
+  return result;
+}
 
 // Initialize tables if they don't exist
 export async function initDb() {
-  await sql`
+  await query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       username VARCHAR(50) UNIQUE NOT NULL,
       password_hash VARCHAR(255) NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
-  `;
+  `);
 
-  await sql`
+  await query(`
     CREATE TABLE IF NOT EXISTS scores (
       id SERIAL PRIMARY KEY,
       user_id INTEGER NOT NULL REFERENCES users(id),
@@ -20,24 +40,24 @@ export async function initDb() {
       quote_id INTEGER,
       played_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
-  `;
+  `);
 
-  await sql`
+  await query(`
     CREATE TABLE IF NOT EXISTS quotes (
       id SERIAL PRIMARY KEY,
       text TEXT NOT NULL,
       source VARCHAR(255)
     )
-  `;
+  `);
 
-  await sql`CREATE INDEX IF NOT EXISTS idx_scores_played_at ON scores(played_at)`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_scores_user_id ON scores(user_id)`;
+  await query(`CREATE INDEX IF NOT EXISTS idx_scores_played_at ON scores(played_at)`);
+  await query(`CREATE INDEX IF NOT EXISTS idx_scores_user_id ON scores(user_id)`);
 }
 
 // Seed quotes if empty
 export async function seedQuotes() {
-  const { rows } = await sql`SELECT COUNT(*) as count FROM quotes`;
-  if (parseInt(rows[0].count) > 0) return;
+  const result = await query('SELECT COUNT(*) as count FROM quotes');
+  if (parseInt(result.rows[0].count) > 0) return;
 
   const quotes = [
     { text: "The only thing we have to fear is fear itself, nameless, unreasoning, unjustified terror which paralyzes needed efforts to convert retreat into advance. In every dark hour of our national life, a leadership of frankness has met.", source: "Franklin D. Roosevelt, First Inaugural Address" },
@@ -93,8 +113,6 @@ export async function seedQuotes() {
   ];
 
   for (const quote of quotes) {
-    await sql`INSERT INTO quotes (text, source) VALUES (${quote.text}, ${quote.source})`;
+    await query('INSERT INTO quotes (text, source) VALUES ($1, $2)', [quote.text, quote.source]);
   }
 }
-
-export { sql };
