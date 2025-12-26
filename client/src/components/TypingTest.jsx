@@ -117,16 +117,15 @@ export default function TypingTest({ onScoreSubmit }) {
     const today = new Date();
     const dateStr = `${today.getMonth() + 1}/${today.getDate()}`;
 
-    // Create speed bar (10 blocks, filled based on WPM)
-    // 0 WPM = 0 blocks, 150+ WPM = 10 blocks
-    const filledBlocks = Math.min(10, Math.round(stats.wpm / 15));
-    const emptyBlocks = 10 - filledBlocks;
-    const speedBar = '▓'.repeat(filledBlocks) + '░'.repeat(emptyBlocks);
+    // Get first ~30 chars of quote for preview
+    const quotePreview = quote.text.length > 30
+      ? quote.text.substring(0, 30).trim() + '...'
+      : quote.text;
 
     return `blurble ${dateStr}
 
-${speedBar} ${stats.wpm} wpm
-⏱️ ${stats.time}s
+"${quotePreview}"
+${stats.wpm} wpm · ${stats.time}s
 
 blurble.xyz`;
   };
