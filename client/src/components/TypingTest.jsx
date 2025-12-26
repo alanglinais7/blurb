@@ -110,6 +110,38 @@ export default function TypingTest({ onScoreSubmit }) {
     return { wpm, time: timeInSeconds.toFixed(1) };
   };
 
+  const [copied, setCopied] = useState(false);
+
+  const getShareText = () => {
+    const stats = getFinalStats();
+    const today = new Date();
+    const dateStr = `${today.getMonth() + 1}/${today.getDate()}`;
+
+    // Create speed bar (10 blocks, filled based on WPM)
+    // 0 WPM = 0 blocks, 150+ WPM = 10 blocks
+    const filledBlocks = Math.min(10, Math.round(stats.wpm / 15));
+    const emptyBlocks = 10 - filledBlocks;
+    const speedBar = '▓'.repeat(filledBlocks) + '░'.repeat(emptyBlocks);
+
+    return `blurble ${dateStr}
+
+${speedBar} ${stats.wpm} wpm
+⏱️ ${stats.time}s
+
+blurble.xyz`;
+  };
+
+  const handleShare = async () => {
+    const text = getShareText();
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
   const renderQuote = () => {
     if (!quote) return null;
 
@@ -205,9 +237,14 @@ export default function TypingTest({ onScoreSubmit }) {
           {mode === 'practice' && (
             <p className="login-prompt">practice mode - score not recorded</p>
           )}
-          <button className="btn-primary" onClick={() => fetchQuote(mode)}>
-            {mode === 'daily' ? 'again' : 'next'}
-          </button>
+          <div className="results-actions">
+            <button className="btn-secondary" onClick={handleShare}>
+              {copied ? 'copied!' : 'share'}
+            </button>
+            <button className="btn-primary" onClick={() => fetchQuote(mode)}>
+              {mode === 'daily' ? 'again' : 'next'}
+            </button>
+          </div>
         </div>
       ) : (
         <>
